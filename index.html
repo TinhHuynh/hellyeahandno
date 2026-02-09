@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hell Yeah or No — Reading List</title>
+  <style>
+    :root {
+      --bg: #fafaf7;
+      --text: #2c2c2c;
+      --muted: #6b6b6b;
+      --accent: #e8b931;
+      --accent-hover: #d4a520;
+      --section-bg: #ffffff;
+      --border: #e8e5de;
+      --link: #2c2c2c;
+      --link-hover: #e8b931;
+      --shadow: 0 1px 3px rgba(0,0,0,0.04);
+      --chapter-bg: transparent;
+      --chapter-hover: #fdf6e3;
+      --check: #4a9e6e;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1a1a1a;
+        --text: #e0ddd5;
+        --muted: #8a8a8a;
+        --accent: #e8b931;
+        --accent-hover: #f0c94d;
+        --section-bg: #242424;
+        --border: #333;
+        --link: #e0ddd5;
+        --link-hover: #e8b931;
+        --shadow: 0 1px 3px rgba(0,0,0,0.2);
+        --chapter-bg: transparent;
+        --chapter-hover: #2a2518;
+        --check: #5cb97a;
+      }
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 4rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.25rem;
+    }
+
+    header h1 span {
+      color: var(--accent);
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .progress-bar {
+      margin: 1.5rem 0;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .progress-track {
+      flex: 1;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: nowrap;
+      min-width: 3.5rem;
+      text-align: right;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    .section-header {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-header .section-count {
+      font-size: 0.65rem;
+      background: var(--border);
+      padding: 0.1rem 0.4rem;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .chapter-list {
+      list-style: none;
+    }
+
+    .chapter-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.6rem 0.5rem;
+      border-radius: 6px;
+      transition: background 0.15s ease;
+    }
+
+    .chapter-item:hover {
+      background: var(--chapter-hover);
+    }
+
+    .chapter-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      position: relative;
+      background: var(--section-bg);
+    }
+
+    .chapter-checkbox:checked {
+      background: var(--check);
+      border-color: var(--check);
+    }
+
+    .chapter-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 1px;
+      width: 5px;
+      height: 9px;
+      border: solid white;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg);
+    }
+
+    .chapter-number {
+      font-size: 0.75rem;
+      color: var(--muted);
+      min-width: 1.25rem;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .chapter-link {
+      color: var(--link);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.15s ease;
+      flex: 1;
+    }
+
+    .chapter-link:hover {
+      color: var(--link-hover);
+    }
+
+    .chapter-item.read .chapter-link {
+      color: var(--muted);
+      text-decoration: line-through;
+      text-decoration-color: var(--border);
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    footer p {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 2rem 1rem 3rem;
+      }
+
+      header h1 {
+        font-size: 1.4rem;
+      }
+
+      .chapter-link {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1><span>Hell Yeah</span> or No</h1>
+      <p>what's worth doing — by Derek Sivers</p>
+      <div class="progress-bar">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text" id="progressText">0 / 67</div>
+      </div>
+    </header>
+
+    <main id="chapters"></main>
+
+    <footer>
+      <p>Chapters link to <a href="https://sive.rs/n" target="_blank" rel="noopener">sive.rs</a> — support Derek by <a href="https://sivers.com" target="_blank" rel="noopener">buying the book</a></p>
+    </footer>
+  </div>
+
+  <script>
+    const sections = [
+      {
+        title: "Opening",
+        chapters: [
+          { title: "About this book", url: "https://sive.rs/hy1" },
+        ]
+      },
+      {
+        title: "Updating Identity",
+        chapters: [
+          { title: "What if you didn't need money or attention?", url: "https://sive.rs/full" },
+          { title: "You don't have to be local", url: "https://sive.rs/local" },
+          { title: "Actions, not words, reveal our real values", url: "https://sive.rs/arv" },
+          { title: "Keep earning your title, or it expires", url: "https://sive.rs/expire" },
+          { title: "Why are you doing?", url: "https://sive.rs/why" },
+          { title: "Some will always say you're wrong", url: "https://sive.rs/wrong" },
+          { title: "Imitate. We are imperfect mirrors.", url: "https://sive.rs/mirror" },
+          { title: "Loving what I used to hate", url: "https://sive.rs/hate" },
+          { title: "The public you is not you", url: "https://sive.rs/publicu" },
+          { title: "Character predicts your future", url: "https://sive.rs/character" },
+          { title: "Fish don't know they're in water", url: "https://sive.rs/fish" },
+          { title: "Are you present-focused or future-focused?", url: "https://sive.rs/time" },
+          { title: "Small actions change your self-identity", url: "https://sive.rs/actid" },
+        ]
+      },
+      {
+        title: "Saying No",
+        chapters: [
+          { title: "If you're not feeling \"hell yeah!\" then say no", url: "https://sive.rs/hyn" },
+          { title: "Saying no to everything else", url: "https://sive.rs/no2" },
+          { title: "Art is useless, and so am I", url: "https://sive.rs/useless" },
+          { title: "I'm a very slow thinker", url: "https://sive.rs/slow" },
+          { title: "Tilting my mirror (motivation is delicate)", url: "https://sive.rs/tilt" },
+          { title: "Quitting something you love", url: "https://sive.rs/quit" },
+          { title: "How will this game end?", url: "https://sive.rs/game" },
+          { title: "Solitary socialite", url: "https://sive.rs/soso" },
+          { title: "Getting out of a bad state of mind", url: "https://sive.rs/bad" },
+        ]
+      },
+      {
+        title: "Making Things Happen",
+        chapters: [
+          { title: "There's no speed limit", url: "https://sive.rs/kimo" },
+          { title: "Relax for the same result", url: "https://sive.rs/relax" },
+          { title: "Disconnect", url: "https://sive.rs/dc" },
+          { title: "Unlikely places and untangled goals", url: "https://sive.rs/unun" },
+          { title: "When you're extremely unmotivated", url: "https://sive.rs/unmo" },
+          { title: "Think like a bronze medalist, not silver", url: "https://sive.rs/bronze" },
+          { title: "Imagining lots of tedious steps? Or one fun step?", url: "https://sive.rs/steps" },
+          { title: "Procrastination hack: change \"and\" to \"or\"", url: "https://sive.rs/andor" },
+          { title: "There are always more than two options", url: "https://sive.rs/options" },
+          { title: "Beware of advice", url: "https://sive.rs/advice" },
+          { title: "Switch strategies", url: "https://sive.rs/switch" },
+          { title: "Don't be a donkey", url: "https://sive.rs/donkey" },
+        ]
+      },
+      {
+        title: "Changing Perspective",
+        chapters: [
+          { title: "I assume I'm below average", url: "https://sive.rs/below-average" },
+          { title: "Everything is my fault", url: "https://sive.rs/my-fault" },
+          { title: "I love being wrong", url: "https://sive.rs/lw" },
+          { title: "Singing the counter-melody", url: "https://sive.rs/counter" },
+          { title: "What are the odds of that?", url: "https://sive.rs/odds" },
+          { title: "two three four ONE, two three four ONE", url: "https://sive.rs/fela" },
+          { title: "232 sand dollars", url: "https://sive.rs/232" },
+          { title: "My favorite fable", url: "https://sive.rs/horses" },
+        ]
+      },
+      {
+        title: "What's Worth Doing?",
+        chapters: [
+          { title: "Obvious to you. Amazing to others.", url: "https://sive.rs/obvious" },
+          { title: "Happy, Smart, and Useful", url: "https://sive.rs/hsu" },
+          { title: "How to do what you love and make good money", url: "https://sive.rs/balance" },
+          { title: "What do you hate not doing?", url: "https://sive.rs/hatenot" },
+          { title: "You don't need confidence, just contribution.", url: "https://sive.rs/contrib" },
+          { title: "Let pedestrians define the walkways", url: "https://sive.rs/walkways" },
+          { title: "Don't start a business until people are asking you to", url: "https://sive.rs/asking" },
+          { title: "Parenting: Who is it really for?", url: "https://sive.rs/pa" },
+          { title: "OK Milt, I'll start writing again", url: "https://sive.rs/milt" },
+        ]
+      },
+      {
+        title: "Fixing Faulty Thinking",
+        chapters: [
+          { title: "Unlearning", url: "https://sive.rs/unlearning" },
+          { title: "Subtract", url: "https://sive.rs/subtract" },
+          { title: "Smart people don't think others are stupid", url: "https://sive.rs/ss" },
+          { title: "The mirror: It's about you, not them.", url: "https://sive.rs/you-not-them" },
+          { title: "Assume men and women are the same", url: "https://sive.rs/mw" },
+          { title: "Moving for good", url: "https://sive.rs/mfg" },
+          { title: "Learning the lesson, not the example.", url: "https://sive.rs/metaphor" },
+          { title: "Overcompensate to compensate", url: "https://sive.rs/compensate" },
+          { title: "Projecting meaning", url: "https://sive.rs/meaning" },
+        ]
+      },
+      {
+        title: "Saying Yes",
+        chapters: [
+          { title: "After fifteen years of practice", url: "https://sive.rs/15-years" },
+          { title: "Goals shape the present, not the future.", url: "https://sive.rs/goals" },
+          { title: "Seeking inspiration?", url: "https://sive.rs/io" },
+          { title: "Possible futures", url: "https://sive.rs/futures" },
+          { title: "If you think you haven't found your passion\u2026", url: "https://sive.rs/passion" },
+          { title: "Whatever scares you, go do it", url: "https://sive.rs/scares" },
+        ]
+      },
+    ];
+
+    const STORAGE_KEY = "hellyeah-read-chapters";
+
+    function getReadChapters() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch {
+        return {};
+      }
+    }
+
+    function saveReadChapters(data) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function updateProgress() {
+      const read = getReadChapters();
+      const total = sections.reduce((sum, s) => sum + s.chapters.length, 0);
+      const done = Object.values(read).filter(Boolean).length;
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressText").textContent = `${done} / ${total}`;
+    }
+
+    function render() {
+      const main = document.getElementById("chapters");
+      const read = getReadChapters();
+      let globalIndex = 0;
+
+      sections.forEach((section) => {
+        const sectionEl = document.createElement("div");
+        sectionEl.className = "section";
+
+        const header = document.createElement("div");
+        header.className = "section-header";
+        header.innerHTML = `${section.title} <span class="section-count">${section.chapters.length}</span>`;
+        sectionEl.appendChild(header);
+
+        const list = document.createElement("ul");
+        list.className = "chapter-list";
+
+        section.chapters.forEach((ch, i) => {
+          globalIndex++;
+          const id = ch.url;
+          const isRead = !!read[id];
+
+          const li = document.createElement("li");
+          li.className = "chapter-item" + (isRead ? " read" : "");
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "chapter-checkbox";
+          checkbox.checked = isRead;
+          checkbox.setAttribute("aria-label", `Mark "${ch.title}" as read`);
+          checkbox.addEventListener("change", () => {
+            const data = getReadChapters();
+            data[id] = checkbox.checked;
+            saveReadChapters(data);
+            li.classList.toggle("read", checkbox.checked);
+            updateProgress();
+          });
+
+          const num = document.createElement("span");
+          num.className = "chapter-number";
+          num.textContent = globalIndex;
+
+          const link = document.createElement("a");
+          link.className = "chapter-link";
+          link.href = ch.url;
+          link.target = "_blank";
+          link.rel = "noopener";
+          link.textContent = ch.title;
+
+          li.appendChild(checkbox);
+          li.appendChild(num);
+          li.appendChild(link);
+          list.appendChild(li);
+        });
+
+        sectionEl.appendChild(list);
+        main.appendChild(sectionEl);
+      });
+
+      updateProgress();
+    }
+
+    render();
+  </script>
+</body>
+</html>
